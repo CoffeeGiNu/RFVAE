@@ -49,7 +49,7 @@ def load_mnist_dataset(name='mnist', split='train', shuffle=True, slice_point=75
     elif split == 'test':
         dataset = tfds.load(name=name, split=f"{split}")
     else:
-        dataset = tfds.load(name=name, split=f"train[:{slice_point}%]")
+        dataset = tfds.load(name=name, split=f"train[{slice_point}%:]")
     dataset = dataset.map(preprocess_fn).batch(batch_size)
     dataset = dataset.prefetch(num_prefetch).shuffle(shuffle)
     # dataset = dataset.as_numpy_iterator()

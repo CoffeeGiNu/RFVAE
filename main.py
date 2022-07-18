@@ -17,11 +17,11 @@ parser.add_argument('-s', '--seed', default=42, type=int)
 parser.add_argument('-is', '--image_size', default=(28, 28), type=tuple)
 parser.add_argument('-ois', '--out_image_size', default=(28, 28), type=tuple)
 parser.add_argument('-ic', '--in_channels', default=1, type=int)
-parser.add_argument('-edh', '--enc_hidden_channels', default=16, type=int)
+parser.add_argument('-edh', '--enc_hidden_channels', default=32, type=int)
 parser.add_argument('-dl', '--dim_latent', default=2, type=int)
-parser.add_argument('-dhf', '--dec_hidden_features', default=32, type=int)
+parser.add_argument('-dhf', '--dec_hidden_features', default=128, type=int)
 parser.add_argument('-doc', '--dec_out_channels', default=1, type=int)
-parser.add_argument('-lr', '--learning_rate', default=2e-3, type=float)
+parser.add_argument('-lr', '--learning_rate', default=1e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=False, type=bool)
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         model.parameters(), 
         lr=LEARNING_RATE, 
         # weight_decay=DECAY, 
-        eps=0.001
+        eps=0.0001
     )
     earlystopping = None
     if IS_EARLY_STOPPING:
