@@ -64,8 +64,9 @@ if __name__ == "__main__":
         dec_hidden_features=DEC_HIDDEN_FEATURES,
         dec_out_channels=DEC_OUT_CHANNELS,
         out_size=OUT_IMAGE_SIZE,
+        device=device,
     ).to(device)
-    optimizer = torch.optim.RAdam(
+    optimizer = torch.optim.Adam(
         model.parameters(), 
         lr=LEARNING_RATE, 
         # weight_decay=DECAY, 

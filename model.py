@@ -103,13 +103,15 @@ class ResolutionFreeVariationalAutoEncoder(nn.Module):
             self.encoder = Encoder(
                 in_channels=in_channels,
                 hidden_channels=enc_hidden_channels,
-                out_channels=dim_latent,)
+                out_channels=dim_latent,
+                device=device,)
         if not decoder:
             self.decoder = Decoder(
                 in_features=dim_latent,
                 hidden_features=dec_hidden_features,
                 out_channels=dec_out_channels,
-                out_size=out_size,)
+                out_size=out_size,
+                device=device,)
         self.pool = nn.AdaptiveAvgPool2d(latent_size)
     
     def reparametrization(self, mean, log_var):
