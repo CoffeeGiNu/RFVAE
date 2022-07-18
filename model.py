@@ -76,7 +76,7 @@ class Decoder(nn.Module):
         ij = torch.tensor(ij, dtype=torch.float, device=self.device)
         ij = torch.broadcast_to(ij, (x.shape[0], ij.shape[1], ij.shape[2], ij.shape[3]))
         x = torch.broadcast_to(x, (x.shape[0], x.shape[1], ij.shape[2], ij.shape[3]))
-        x = torch.concat((x, ij), dim=1)
+        x = torch.cat((x, ij), dim=1)
         x = torch.reshape(x, (-1, self.in_features+2))
 
         x = self.activation(self.affine_1(x))
