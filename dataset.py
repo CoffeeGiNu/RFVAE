@@ -42,7 +42,7 @@ def cast_and_nomrmalise_images(images):
         return images
 
 
-def load_mnist_dataset(name='mnist', split='train', shuffle=True, slice_point=75,
+def load_mnist_dataset(name='mnist', split='train', shuffle=True, slice_point=90,
     batch_size=64, num_prefetch=AUTOTUNE, preprocess_fn=None):
     if split == 'train':
         dataset = tfds.load(name=name, split=f"{split}[:{slice_point}%]")

@@ -66,6 +66,7 @@ class Decoder(nn.Module):
             in_features=hidden_features,
             out_features=out_channels)
         self.activation = nn.Softplus()
+        self.sigmoid = nn.Sigmoid()
     
     def forward(self, x):
         i = np.linspace(-1, 1, self.out_size[0])
@@ -81,7 +82,7 @@ class Decoder(nn.Module):
         x = self.activation(self.affine_1(x))
         x = self.activation(self.affine_2(x))
         x = self.activation(self.affine_3(x))
-        x = self.affine_4(x)
+        x = self.sigmoid(self.affine_4(x))
         reconstraction = torch.reshape(x, 
             (-1, self.out_channels, self.out_size[0], self.out_size[1]))
 
