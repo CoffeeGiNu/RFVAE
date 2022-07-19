@@ -97,7 +97,7 @@ class VAELoss(nn.Module):
     def forward(self, inputs, mean, log_var, outputs):
         reconstruction_loss = -torch.mean(torch.sum(
             inputs * torch.log(outputs) + (1-inputs) * torch.log(1-outputs), dim=1))
-        # reconstruction_loss = F.binary_cross_entropy(inputs, outputs) / (inputs.shape[2] * inputs.shape[3])
+        # reconstruction_loss = F.binary_cross_entropy(inputs, outputs) / (outputs.shape[2] * outputs.shape[3])
         kl_divergence = -1/2 * torch.mean(torch.sum(
             1 + log_var - torch.pow(mean, 2) - torch.exp(log_var), dim=1))
         loss = reconstruction_loss + kl_divergence
