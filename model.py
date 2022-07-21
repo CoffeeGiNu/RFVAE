@@ -33,7 +33,7 @@ class Encoder(nn.Module):
             kernel_size=4,
             stride=2,
             padding=0)
-        self.activation = nn.ReLU()
+        self.activation = nn.Softplus()
     
     def forward(self, x):
         x = self.activation(self.conv_1(x))
@@ -54,15 +54,15 @@ class Decoder(nn.Module):
         self.out_channels = out_channels
         self.out_size = out_size
         self.affine_1 = nn.Linear(
-            in_features=out_size[0]*out_size[1]*(in_features+2),
+            in_features=in_features+2,
             out_features=hidden_features//2)
         self.affine_2 = nn.Linear(
             in_features=hidden_features//2,
             out_features=hidden_features)
         self.affine_3 = nn.Linear(
             in_features=hidden_features,
-            out_features=out_channels*out_size[0]*out_size[1])
-        self.activation = nn.ReLU()
+            out_features=out_channels)
+        self.activation = nn.Softplus()
         self.sigmoid = nn.Sigmoid()
     
     def forward(self, x):
@@ -78,7 +78,8 @@ class Decoder(nn.Module):
         x = torch.cat((x, ij), dim=1)
 
         x = torch.permute(x, (0, 2, 3, 1))
-        x = torch.reshape(x, (-1, self.out_size[0]*self.out_size[1]*(self.in_features+2)))
+        x = torch.reshape(x, (-1, x.shape[3]))
+
 
         x = self.activation(self.affine_1(x))
         x = self.activation(self.affine_2(x))
@@ -93,7 +94,7 @@ class Decoder(nn.Module):
 class ResolutionFreeVariationalAutoEncoder(nn.Module):
     def __init__(self, 
         in_channels, enc_hidden_channels, dim_latent,
-        dec_hidden_features, dec_out_channels, out_size,
+        dec_hidden_features, out_channels, out_size,
         encoder=None, decoder=None, 
         latent_size=(1, 1), device='cpu', name=None) -> None:
         super(ResolutionFreeVariationalAutoEncoder, self).__init__()
@@ -110,7 +111,7 @@ class ResolutionFreeVariationalAutoEncoder(nn.Module):
             self.decoder = Decoder(
                 in_features=dim_latent,
                 hidden_features=dec_hidden_features,
-                out_channels=dec_out_channels,
+                out_channels=out_channels,
                 out_size=out_size,
                 device=device,)
         self.pool = nn.AdaptiveAvgPool2d(latent_size)

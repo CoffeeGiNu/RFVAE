@@ -47,7 +47,7 @@ def load_mnist_dataset(name='mnist', split='train', shuffle=True, slice_point=90
     if split == 'train':
         dataset = tfds.load(name=name, split=f"{split}[:{slice_point}%]")
     elif split == 'test':
-        dataset = tfds.load(name=name, split=f"{split}")
+        dataset = tfds.load(name=name,)
     else:
         dataset = tfds.load(name=name, split=f"train[{slice_point}%:]")
     dataset = dataset.map(preprocess_fn).batch(batch_size)
