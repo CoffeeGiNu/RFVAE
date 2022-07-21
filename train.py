@@ -1,5 +1,6 @@
 import os
 import sys
+import copy
 from tqdm.auto import tqdm
 
 import torch
@@ -27,11 +28,14 @@ def step(model, inputs, labels, optimizer, criterion, device, is_train=True):
             outputs=results['outputs'])
         loss = loss_dict['loss']
         if is_train:
-            loss.backward()
-            # nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0, norm_type=2)
-            optimizer.step()
+            if not torch.isnan(loss):
+                loss.backward()
+                nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0, norm_type=2)
+                optimizer.step()
+            # loss.backward()
+            # optimizer.step()
     # results['loss'] = loss
-    # results['reconstructed_error'] = reconstructed_error
+    # results['reconstraction_error'] = reconstraction_error
     # results['q_latent_loss'] = q_latent_loss
     # results['e_latent_loss'] = e_latent_loss
     return model, results, loss_dict
@@ -61,7 +65,7 @@ def epoch_loop(model, data_set, optimizer, criterion, device, epoch, num_epochs,
             if writer:
                 writer.add_scalar("loss_train/loss", 
                     loss_dict['loss'].cpu().detach().numpy(), epoch + total)
-                writer.add_scalar("loss_train/reconstructed_loss", 
+                writer.add_scalar("loss_train/reconstraction_loss", 
                     loss_dict['reconstruction_loss'].cpu().detach().numpy(), epoch + total)
                 writer.add_scalar("loss_train/kl_divergence", 
                     loss_dict['kl_divergence'].cpu().detach().numpy(), epoch + total)
@@ -93,11 +97,19 @@ class VAELoss(nn.Module):
 
     def __init__(self):
         super().__init__()
+        self.eps = np.spacing(1)
 
     def forward(self, inputs, mean, log_var, outputs):
-        reconstruction_loss = -torch.mean(torch.sum(
-            inputs * torch.log(outputs) + (1-inputs) * torch.log(1-outputs), dim=1))
-        # reconstruction_loss = F.binary_cross_entropy(inputs, outputs) / (outputs.shape[2] * outputs.shape[3])
+        # reconstruction_loss = -torch.mean(torch.sum(
+        #     inputs * torch.log(outputs + self.eps) 
+        #     + (1 - inputs) * torch.log(1 - outputs + self.eps), dim=1))
+        # reconstruction_loss = -torch.sum(
+        #     inputs * torch.log(outputs + self.eps) 
+        #     + (1 - inputs) * torch.log(1 - outputs + self.eps))
+        # reconstruction_loss = -torch.mean(torch.sum(
+        #     inputs * torch.log(outputs) + (1-inputs) * torch.log(1-outputs), dim=1))
+        # reconstruction_loss = F.binary_cross_entropy(inputs, outputs)
+        reconstruction_loss = outputs.shape[2] * outputs.shape[3] * F.mse_loss(inputs, outputs)
         kl_divergence = -1/2 * torch.mean(torch.sum(
             1 + log_var - torch.pow(mean, 2) - torch.exp(log_var), dim=1))
         loss = reconstruction_loss + kl_divergence

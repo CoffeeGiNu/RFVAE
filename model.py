@@ -33,7 +33,7 @@ class Encoder(nn.Module):
             kernel_size=4,
             stride=2,
             padding=0)
-        self.activation = nn.Softplus()
+        self.activation = nn.ReLU()
     
     def forward(self, x):
         x = self.activation(self.conv_1(x))
@@ -54,18 +54,15 @@ class Decoder(nn.Module):
         self.out_channels = out_channels
         self.out_size = out_size
         self.affine_1 = nn.Linear(
-            in_features=in_features+2,
+            in_features=out_size[0]*out_size[1]*(in_features+2),
             out_features=hidden_features//2)
         self.affine_2 = nn.Linear(
             in_features=hidden_features//2,
             out_features=hidden_features)
         self.affine_3 = nn.Linear(
             in_features=hidden_features,
-            out_features=hidden_features)
-        self.affine_4 = nn.Linear(
-            in_features=hidden_features,
-            out_features=out_channels)
-        self.activation = nn.Softplus()
+            out_features=out_channels*out_size[0]*out_size[1])
+        self.activation = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
     
     def forward(self, x):
@@ -75,16 +72,20 @@ class Decoder(nn.Module):
         ij = np.transpose(ij, (0, 1, 3, 2))
         ij = torch.tensor(ij, dtype=torch.float, device=self.device)
         ij = torch.broadcast_to(ij, (x.shape[0], ij.shape[1], ij.shape[2], ij.shape[3]))
+        
         x = torch.broadcast_to(x, (x.shape[0], x.shape[1], ij.shape[2], ij.shape[3]))
+
         x = torch.cat((x, ij), dim=1)
-        x = torch.reshape(x, (-1, self.in_features+2))
+
+        x = torch.permute(x, (0, 2, 3, 1))
+        x = torch.reshape(x, (-1, self.out_size[0]*self.out_size[1]*(self.in_features+2)))
 
         x = self.activation(self.affine_1(x))
         x = self.activation(self.affine_2(x))
-        x = self.activation(self.affine_3(x))
-        x = self.sigmoid(self.affine_4(x))
-        reconstraction = torch.reshape(x, 
-            (-1, self.out_channels, self.out_size[0], self.out_size[1]))
+        x = self.sigmoid(self.affine_3(x))
+        x = torch.reshape(x, 
+            (-1, self.out_size[0], self.out_size[1], self.out_channels))
+        reconstraction = torch.permute(x, (0, 3, 1, 2))
 
         return reconstraction
 
