@@ -24,7 +24,7 @@ parser.add_argument('-oc', '--out_channels', default=1, type=int)
 parser.add_argument('-lr', '--learning_rate', default=2e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=False, type=bool)
-parser.add_argument('-pm', '--path_model', default='./models/checkpoint.pth', type=str)
+parser.add_argument('-pm', '--path_model', default='./models/', type=str)
 
 args = parser.parse_args()
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     earlystopping = None
     if IS_EARLY_STOPPING:
-        earlystopping = EarlyStopping(path=PATH_MODEL, patience=5)
+        earlystopping = EarlyStopping(path=PATH_MODEL, model_file_name=f'checkpoint_z{DIM_LATENT}.pth', patience=5)
     criterion = VAELoss()
 
     if IS_PROFILE:

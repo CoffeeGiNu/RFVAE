@@ -23,7 +23,7 @@ parser.add_argument('-oc', '--out_channels', default=1, type=int)
 parser.add_argument('-lr', '--learning_rate', default=1e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=False, type=bool)
-parser.add_argument('-pm', '--path_model', default='./models/checkpoint.pth', type=str)
+parser.add_argument('-pm', '--path_model', default='./model/', type=str)
 
 args = parser.parse_args()
 
