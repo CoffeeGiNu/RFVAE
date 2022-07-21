@@ -15,15 +15,16 @@ parser.add_argument('-ne', '--num_epochs', default=128, type=int)
 parser.add_argument('-bs', '--batch_size', default=32, type=int)
 parser.add_argument('-s', '--seed', default=42, type=int)
 parser.add_argument('-is', '--image_size', default=(28, 28), type=tuple)
-parser.add_argument('-ois', '--out_image_size', default=(28, 28), type=tuple)
+parser.add_argument('-ois', '--out_image_size', default=(28, 28), type=image_size)
 parser.add_argument('-ic', '--in_channels', default=1, type=int)
-parser.add_argument('-edh', '--enc_hidden_channels', default=64, type=int)
+parser.add_argument('-edh', '--enc_hidden_channels', default=32, type=int)
 parser.add_argument('-dl', '--dim_latent', default=2, type=int)
-parser.add_argument('-dhf', '--dec_hidden_features', default=512, type=int)
+parser.add_argument('-dhf', '--dec_hidden_features', default=256, type=int)
 parser.add_argument('-oc', '--out_channels', default=1, type=int)
 parser.add_argument('-lr', '--learning_rate', default=2e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=False, type=bool)
+parser.add_argument('-pm', '--path_model', default='./models/checkpoint.pth', type=str)
 
 args = parser.parse_args()
 
@@ -39,7 +40,7 @@ SEED = args.seed
 LEARNING_RATE = args.learning_rate
 IS_PROFILE = args.is_profiler
 IS_EARLY_STOPPING = args.is_early_stopping
-
+PATH_MODEL = args.path_model
 
 if __name__ == "__main__":
     fix_seed(SEED)
@@ -83,7 +84,7 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     earlystopping = None
     if IS_EARLY_STOPPING:
-        earlystopping = EarlyStopping(path='models/', patience=5)
+        earlystopping = EarlyStopping(path=PATH_MODEL, patience=5)
     criterion = VAELoss()
 
     if IS_PROFILE:

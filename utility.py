@@ -1,5 +1,6 @@
 import torch
 import random
+import argparse
 import numpy as np
 import tensorflow as tf
 
@@ -7,6 +8,14 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 # matplotlib.style.use('ggplot')
+
+
+def image_size(s):
+    try:
+        h, w = map(int, s.split(','))
+        return h, w
+    except:
+        raise argparse.ArgumentTypeError("image size must be height, width")
 
 
 def fix_seed(seed):

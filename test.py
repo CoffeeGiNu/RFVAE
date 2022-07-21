@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-from utility import fix_seed
+from utility import *
 from model import *
 from dataset import *
 
@@ -14,7 +14,7 @@ parser.add_argument('-ne', '--num_epochs', default=128, type=int)
 parser.add_argument('-bs', '--batch_size', default=10, type=int)
 parser.add_argument('-s', '--seed', default=42, type=int)
 parser.add_argument('-is', '--in_image_size', default=(28, 28), type=tuple)
-parser.add_argument('-ois', '--out_image_size', default=(28, 28), type=tuple)
+parser.add_argument('-ois', '--out_image_size', default=(28, 28), type=image_size)
 parser.add_argument('-ic', '--in_channels', default=1, type=int)
 parser.add_argument('-edh', '--enc_hidden_channels', default=64, type=int)
 parser.add_argument('-dl', '--dim_latent', default=2, type=int)
@@ -23,6 +23,7 @@ parser.add_argument('-oc', '--out_channels', default=1, type=int)
 parser.add_argument('-lr', '--learning_rate', default=1e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=False, type=bool)
+parser.add_argument('-pm', '--path_model', default='./models/checkpoint.pth', type=str)
 
 args = parser.parse_args()
 
@@ -39,6 +40,7 @@ SEED = args.seed
 LEARNING_RATE = args.learning_rate
 IS_PROFILE = args.is_profiler
 IS_EARLY_STOPPING = args.is_early_stopping
+PATH_MODEL = args.path_model
 
 
 if __name__ == "__main__":
@@ -57,7 +59,7 @@ if __name__ == "__main__":
         out_size=OUT_IMAGE_SIZE,
         device=device,
     )
-    model.load_state_dict(torch.load("./models/checkpoint.pth"))
+    model.load_state_dict(torch.load(PATH_MODEL))
     model.eval()
 
     for inputs in dataset_test:
@@ -81,6 +83,6 @@ if __name__ == "__main__":
             axes[1][j].imshow(image_y[j], "gray")
             axes[1][j].set_xticks([])
             axes[1][j].set_yticks([])
-        fig.savefig(f"./figure/reconstracttion_z{DIM_LATENT}.png")
+        fig.savefig(f"./figure/reconstracttion_z{DIM_LATENT}_({OUT_IMAGE_SIZE[0]}_{OUT_IMAGE_SIZE[1]}).png")
         plt.close()
         break

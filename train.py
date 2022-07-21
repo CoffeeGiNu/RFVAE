@@ -123,7 +123,7 @@ class VAELoss(nn.Module):
 class EarlyStopping:
     """earlystoppingクラス"""
 
-    def __init__(self, patience=5, verbose=False, path='models/'):
+    def __init__(self, patience=5, verbose=False, path='models/checkpoint.pth'):
         """引数：最小値の非更新数カウンタ、表示設定、モデル格納path"""
 
         self.patience = patience    #設定ストップカウンタ
@@ -160,5 +160,5 @@ class EarlyStopping:
         '''ベストスコア更新時に実行されるチェックポイント関数'''
         if self.verbose:  #表示を有効にした場合は、前回のベストスコアからどれだけ更新したか？を表示
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
-        torch.save(model.to('cpu').state_dict(), self.path+"checkpoint.pth")  #ベストモデルを指定したpathに保存
+        torch.save(model.to('cpu').state_dict(), self.path)  #ベストモデルを指定したpathに保存
         self.val_loss_min = val_loss  #その時のlossを記録する
