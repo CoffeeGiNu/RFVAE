@@ -66,12 +66,20 @@ if __name__ == "__main__":
         out_size=OUT_IMAGE_SIZE,
         device=device,
     ).to(device)
-    optimizer = torch.optim.RAdam(
-        model.parameters(), 
-        lr=LEARNING_RATE, 
-        # weight_decay=DECAY, 
-        eps=0.0001
-    )
+    try:
+        optimizer = torch.optim.RAdam(
+            model.parameters(), 
+            lr=LEARNING_RATE, 
+            # weight_decay=DECAY, 
+            eps=0.000
+        )
+    except:
+        optimizer = torch.optim.Adam(
+            model.parameters(), 
+            lr=LEARNING_RATE, 
+            # weight_decay=DECAY, 
+            eps=0.000
+        )
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     earlystopping = None
     if IS_EARLY_STOPPING:
