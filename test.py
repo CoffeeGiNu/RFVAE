@@ -48,7 +48,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     dataset_test = load_mnist_dataset(
-        split='valid', preprocess_fn=cast_and_nomrmalise_images)
+        split='test', preprocess_fn=cast_and_nomrmalise_images)
     
     model = ResolutionFreeVariationalAutoEncoder(
         in_channels=IN_CHANNELS,
