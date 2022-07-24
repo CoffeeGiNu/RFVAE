@@ -61,10 +61,11 @@ if __name__ == "__main__":
     )
     model.load_state_dict(torch.load(PATH_MODEL))
     model.eval()
+    model.to(device)
 
     for inputs in dataset_test:
         inputs = inputs['image']
-        inputs = torch.from_numpy(np.array(inputs))
+        inputs = torch.from_numpy(np.array(inputs)).to(device)
         fig, axes = plt.subplots(2, 10, figsize=(20, 4))
         # for a in axes:
         #     a.set_xticks([])
