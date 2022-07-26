@@ -59,6 +59,7 @@ if __name__ == "__main__":
         out_size=OUT_IMAGE_SIZE,
         device=device,
     )
+    model.decoder.out_size = OUT_IMAGE_SIZE
     model.load_state_dict(torch.load(PATH_MODEL))
     model.eval()
     model.to(device)

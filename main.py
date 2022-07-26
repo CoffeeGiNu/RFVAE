@@ -24,7 +24,10 @@ parser.add_argument('-oc', '--out_channels', default=1, type=int)
 parser.add_argument('-lr', '--learning_rate', default=1e-3, type=float)
 parser.add_argument('-ip', '--is_profiler', default=False, type=bool)
 parser.add_argument('-es', '--is_early_stopping', default=True, type=bool)
+parser.add_argument('-rt', '--is_resume_train', default=False, type=bool)
 parser.add_argument('-pm', '--path_model', default='./models/', type=str)
+parser.add_argument('-mfn', '--model_file_name', default='checkpoint.pt', type=str)
+parser.add_argument('-ds', '--dataset', default='mnist', type=str) # or svhn_cropped
 
 args = parser.parse_args()
 
@@ -40,7 +43,10 @@ SEED = args.seed
 LEARNING_RATE = args.learning_rate
 IS_PROFILE = args.is_profiler
 IS_EARLY_STOPPING = args.is_early_stopping
+IS_RESUME_TRAIN = args.is_resume_train
 PATH_MODEL = args.path_model
+MODEL_FILE_NAME = args.model_file_name
+DATASET = args.dataset
 
 if __name__ == "__main__":
     fix_seed(SEED)
@@ -53,9 +59,9 @@ if __name__ == "__main__":
     
     os.makedirs(log_dir) if not os.path.exists(log_dir) else None
     
-    dataset_train = load_mnist_dataset(
+    dataset_train = load_dataset(name=DATASET,
         batch_size=BATCH_SIZE, preprocess_fn=cast_and_nomrmalise_images)
-    dataset_valid = load_mnist_dataset(
+    dataset_valid = load_dataset(name=DATASET,
         batch_size=BATCH_SIZE, split='valid', preprocess_fn=cast_and_nomrmalise_images)
     
     model = ResolutionFreeVariationalAutoEncoder(
@@ -66,7 +72,7 @@ if __name__ == "__main__":
         out_channels=OUT_CHANNELS,
         out_size=OUT_IMAGE_SIZE,
         device=device,
-    ).to(device)
+    )
     try:
         optimizer = torch.optim.RAdam(
             model.parameters(), 
@@ -81,10 +87,12 @@ if __name__ == "__main__":
             # weight_decay=DECAY, 
             eps=0.000
         )
+    if IS_RESUME_TRAIN:
+        model.load_state_dict(torch.load(PATH_MODEL+MODEL_FILE_NAME))
+    model.to(device)
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
-    earlystopping = None
     if IS_EARLY_STOPPING:
-        earlystopping = EarlyStopping(path=PATH_MODEL, model_file_name=f'checkpoint_z{DIM_LATENT}.pth', patience=5)
+        earlystopping = EarlyStopping(path=PATH_MODEL, model_file_name=MODEL_FILE_NAME, patience=5)
     criterion = VAELoss()
 
     if IS_PROFILE:
