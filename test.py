@@ -47,7 +47,7 @@ if __name__ == "__main__":
     log_dir = "./logs"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    dataset_test = load_mnist_dataset(
+    dataset_test = load_dataset(
         split='test', preprocess_fn=cast_and_nomrmalise_images)
     
     model = ResolutionFreeVariationalAutoEncoder(
