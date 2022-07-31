@@ -90,7 +90,7 @@ if __name__ == "__main__":
     if IS_RESUME_TRAIN:
         model.load_state_dict(torch.load(PATH_MODEL+MODEL_FILE_NAME))
     model.to(device)
-    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, last_epoch=NUM_EPOCHS)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     if IS_EARLY_STOPPING:
         earlystopping = EarlyStopping(path=PATH_MODEL, model_file_name=MODEL_FILE_NAME, patience=5)
     criterion = VAELoss()
